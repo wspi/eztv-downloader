@@ -38,6 +38,6 @@ try:
 		config.write(configfile)
         eztvLogger.logging.info("Serie " + filename + " criada!")
 except:
-	print "Nenhuma série encontrada com esse nome"
+	print "Couldn't find a TV Show with this name!"
 	traceback.print_exc(file=sys.stdout)
 

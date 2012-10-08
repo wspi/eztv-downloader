@@ -51,9 +51,7 @@ for cfg in os.listdir("/etc/eztv-downloader/shows/"):
             arquivos = re.findall("http.+[sS]\d{2}[eE]\d{2}.+[.]torrent", episodios)
 
             for arquivo in arquivos[::-1]:
-#		print arquivo
                 episodio = [int(re.search('([sS]\d{2}[eE]\d{2})', arquivo).group(0).upper().split('E')[0].split('S')[1]), int(re.search('([sS]\d{2}[eE]\d{2})', arquivo).group(0).upper().split('E')[1])]
-#		print str(episodio_local) + " " + str(episodio)
                 if episodio_local >= episodio:
                     pass
                 else:
@@ -61,19 +59,16 @@ for cfg in os.listdir("/etc/eztv-downloader/shows/"):
 		        if word.endswith('.torrent"'):
 			    word = word.split("\"")
 			    word = word[len(word)-2].split()[0]
-#			    print "FIM " + str(word)
 			    episodios_novos.append(word)
 			    break
 			elif word.endswith('.torrent'):
 			    word = word.split("\"")[1]
-#			    print "WAGNER " + str(word)
 			    episodios_novos.append(word)
 			    break
-#                    episodios_novos.append([ word for word in arquivo.split() if word.endswith('.torrent"') ][0].split("\"")[0])
 		    episodio_local = episodio
   
             if len(episodios_novos) > 0:
-                series_logger.logging.info(str(len(episodios_novos)) + " novos episódios em " + cfg.replace(".cfg", ""))
+                series_logger.logging.info(str(len(episodios_novos)) + " new episodes from " + cfg.replace(".cfg", ""))
                 for episodio_novo in episodios_novos:
                     download(str(episodio_novo))
                 config.set('Serie', 'Season', int(re.search('([sS]\d{2}[eE]\d{2})', episodios_novos[len(episodios_novos)-1]).group(0).upper().split('E')[0].split('S')[1]))
@@ -82,8 +77,8 @@ for cfg in os.listdir("/etc/eztv-downloader/shows/"):
                     config.write(configfile)
 
             else:
-                eztvLogger.logging.info("Nenhum episódio novo em " + cfg.replace(".cfg", ""))
+                eztvLogger.logging.info("No new episodes from " + cfg.replace(".cfg", ""))
 	except:
-	    print "Erro!"
+	    print "Error!"
 	    traceback.print_exc(file=sys.stdout)
 
