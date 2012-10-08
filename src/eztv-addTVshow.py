@@ -3,6 +3,11 @@
 
 import ConfigParser, sys, urllib, re, traceback, eztvLogger 
 
+if (len(sys.argv) < 4):
+    print "usage: " + sys.argv[0] + " \"TV Show\" Season Episode"
+    sys.exit(1)
+
+
 filename = sys.argv[1].title()
 
 if ('The ' in filename):
