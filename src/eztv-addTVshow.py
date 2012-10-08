@@ -36,7 +36,7 @@ try:
 
 	with open('/etc/eztv-downloader/shows/' + filename.replace(' ', '') + '.cfg', 'wb') as configfile:
 		config.write(configfile)
-        eztvLogger.logging.info("Serie " + filename + " criada!")
+        eztvLogger.logging.info("TV Show " + sys.argv[1].title() + " added!")
 except:
 	print "Couldn't find a TV Show with this name!"
 	traceback.print_exc(file=sys.stdout)
