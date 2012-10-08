@@ -1,0 +1,7 @@
+[Download]
+folder = /home/user/watchfolder/
+
+[Log]
+path = /var/log/
+name = eztv-downloader.log
+
