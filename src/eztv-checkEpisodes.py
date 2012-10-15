@@ -27,7 +27,8 @@ def download(url):
         f.write(buffer)
         status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
         status = status + chr(8)*(len(status)+1)
-        print status,
+        #print status,
+        eztvLogger.logging.info(status),
 
     f.close()
 
@@ -48,10 +49,11 @@ for cfg in os.listdir("/etc/eztv-downloader/shows/"):
             episodios = serie.read()
             serie.close()
 
-            arquivos = re.findall("http.+[sS]\d{2}[eE]\d{2}.+[.]torrent", episodios)
+            arquivos = re.findall("http.+\d+[eExX]\d+.+[.]torrent", episodios)
 
             for arquivo in arquivos[::-1]:
-                episodio = [int(re.search('([sS]\d{2}[eE]\d{2})', arquivo).group(0).upper().split('E')[0].split('S')[1]), int(re.search('([sS]\d{2}[eE]\d{2})', arquivo).group(0).upper().split('E')[1])]
+		atual = re.split('E|X', re.search('(\d+[eExX]\d+)', arquivo).group(0).upper())
+                episodio = [int(atual[0]), int(atual[1])]
                 if episodio_local >= episodio:
                     pass
                 else:
@@ -68,11 +70,12 @@ for cfg in os.listdir("/etc/eztv-downloader/shows/"):
 		    episodio_local = episodio
   
             if len(episodios_novos) > 0:
-                series_logger.logging.info(str(len(episodios_novos)) + " new episodes from " + cfg.replace(".cfg", ""))
+                eztvLogger.logging.info(str(len(episodios_novos)) + " new episodes from " + cfg.replace(".cfg", ""))
                 for episodio_novo in episodios_novos:
                     download(str(episodio_novo))
-                config.set('Serie', 'Season', int(re.search('([sS]\d{2}[eE]\d{2})', episodios_novos[len(episodios_novos)-1]).group(0).upper().split('E')[0].split('S')[1]))
-                config.set('Serie', 'Episode', int(re.search('([sS]\d{2}[eE]\d{2})', episodios_novos[len(episodios_novos)-1]).group(0).upper().split('E')[1]))
+		ultimo = re.split('E|X', re.search('(\d+[eExX]\d+)', episodios_novos[len(episodios_novos)-1]).group(0).upper()
+                config.set('Serie', 'Season', int(ultimo[0]))
+                config.set('Serie', 'Episode', int(ultimo[1]))
                 with open("/etc/eztv-downloader/" + cfg, 'wb') as configfile:
                     config.write(configfile)
 
