@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import urllib, re, ConfigParser, sys, os, traceback, eztvLogger
+import urllib, re, ConfigParser, sys, os, traceback, eztvLogger, lxml.html
 
 Conf = ConfigParser.RawConfigParser()
 Conf.read("/etc/eztv-downloader/Conf")
-
-
 
 def download(url):
     file_name = url.split('/')[-1]
@@ -28,63 +26,65 @@ def download(url):
         status = r"%10d  [%3.2f%%]" % (file_size_dl, file_size_dl * 100. / file_size)
         status = status + chr(8)*(len(status)+1)
         #print status,
-        eztvLogger.logging.info(status),
+#        eztvLogger.logging.info(status),
 
     f.close()
 
-for cfg in os.listdir("/etc/eztv-downloader/shows/"):
-    if cfg.endswith(".cfg"):
-        config = ConfigParser.RawConfigParser()
-        config.read("/etc/eztv-downloader/shows/" + cfg)
 
-        episodio_local=[config.getint('Serie', 'Season'), config.getint('Serie', 'Episode')]
-        episodios_novos = []
+def getEpisode():
+    try:    
+        for cfg in os.listdir("/etc/eztv-downloader/shows/"):
+            if cfg.endswith(".cfg"):
+                config = ConfigParser.RawConfigParser()
+                config.read("/etc/eztv-downloader/shows/" + cfg)
 
-        try:
-            params = {"SearchString": config.getint('Serie', 'id')}
-            query = urllib.urlencode(params)
-            url = "http://eztv.it/search/"
+        	episodio_local=[config.getint('Serie', 'Season'), config.getint('Serie', 'Episode')]
+        	episodios_novos = []
 
-            serie = urllib.urlopen(url, query)
-            episodios = serie.read()
-            serie.close()
+                params = {"SearchString": config.getint('Serie', 'id')}
+                query = urllib.urlencode(params)
+                url = "http://eztv.it/search/"
 
-            arquivos = re.findall("http.+\d+[eExX]\d+.+[.]torrent", episodios)
+                serie = urllib.urlopen(url, query)
+                episodios = serie.read()
+                serie.close()
 
-            for arquivo in arquivos[::-1]:
-		atual = re.split('E|X', re.search('(\d+[eExX]\d+)', arquivo).group(0).upper())
-                episodio = [int(atual[0]), int(atual[1])]
-                if episodio_local >= episodio:
-                    pass
-                else:
-		    for word in arquivo.split():
-		        if word.endswith('.torrent"'):
-			    word = word.split("\"")
-			    word = word[len(word)-2].split()[0]
-			    episodios_novos.append(word)
-			    break
-			elif word.endswith('.torrent') and word.startswith('"'):
-			    word = word.split("\"")[1]
-			    episodios_novos.append(word)
-			    break
-			elif word.endswith('.torrent') and word.startswith('http'):
-			    episodios_novos.append(word)
-			    break
-		    episodio_local = episodio
+	        doc = lxml.html.fromstring(episodios)
+	        links = doc.xpath('//a/@href')
+	    
+  	        torrents = []
+                for link in links:
+		    if link.endswith(".torrent"):
+			torrents.append(re.findall(r'(.*(?:s|season|\.)(\d{1,2})(?:e|x|episode)(\d{1,2}).*)', link, re.I))
+		
+
+                episodios_processados = []
+		
+                for torrent in torrents:
+                    if (len(torrent)==0):
+                        pass
+                    else:
+		        episodio = [int(torrent[0][1]), int(torrent[0][2])]
+                        if episodio_local >= episodio or episodios_processados.__contains__(episodio):
+                            pass
+                        else:
+                	    episodios_novos.append(torrent[0][0])
+		            episodios_processados.append(episodio)
   
-            if len(episodios_novos) > 0:
-                eztvLogger.logging.info(str(len(episodios_novos)) + " new episodes from " + cfg.replace(".cfg", ""))
-                for episodio_novo in episodios_novos:
-                    download(str(episodio_novo))
-		ultimo = re.split('E|X', re.search('(\d+[eExX]\d+)', episodios_novos[len(episodios_novos)-1]).group(0).upper())
-                config.set('Serie', 'Season', int(ultimo[0]))
-                config.set('Serie', 'Episode', int(ultimo[1]))
-                with open("/etc/eztv-downloader/shows/" + cfg, 'wb') as configfile:
-                    config.write(configfile)
+                if len(episodios_novos) > 0:
+                    eztvLogger.logging.info(str(len(episodios_novos)) + " new episodes from " + cfg.replace(".cfg", ""))
+                    for episodio_novo in episodios_novos:
+                        download(str(episodio_novo))
+  		    ultimo = re.split('E|X', re.search('(\d+[eExX]\d+)', episodios_novos[0]).group(0).upper())
+                    config.set('Serie', 'Season', int(ultimo[0]))
+                    config.set('Serie', 'Episode', int(ultimo[1]))
+                    with open("/etc/eztv-downloader/shows/" + cfg, 'wb') as configfile:
+                        config.write(configfile)
 
-            else:
-                eztvLogger.logging.info("No new episodes from " + cfg.replace(".cfg", ""))
-	except:
-	    print "Error!"
-	    traceback.print_exc(file=sys.stdout)
+                else:
+                    eztvLogger.logging.info("No new episodes from " + cfg.replace(".cfg", ""))
+    except:
+        print "Error!"
+	traceback.print_exc(file=sys.stdout)
 
+getEpisode()
