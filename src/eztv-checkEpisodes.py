@@ -11,7 +11,7 @@ Conf.read("/etc/eztv-downloader/Conf")
 def download(url):
     file_name = url.split('/')[-1]
     u = urllib.urlopen(url)
-    f = open(Conf.get('Download', 'folder') + file_name, 'wb')
+    f = open(Conf.get('Download', 'folder') + "/" + file_name, 'wb')
     meta = u.info()
     file_size = int(meta.getheaders("Content-Length")[0])
     eztvLogger.logging.info("Downloading: %s Bytes: %s" % (file_name, file_size))
