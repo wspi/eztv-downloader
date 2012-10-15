@@ -63,8 +63,11 @@ for cfg in os.listdir("/etc/eztv-downloader/shows/"):
 			    word = word[len(word)-2].split()[0]
 			    episodios_novos.append(word)
 			    break
-			elif word.endswith('.torrent'):
+			elif word.endswith('.torrent') and word.startswith('"'):
 			    word = word.split("\"")[1]
+			    episodios_novos.append(word)
+			    break
+			elif word.endswith('.torrent') and word.startswith('http'):
 			    episodios_novos.append(word)
 			    break
 		    episodio_local = episodio
@@ -73,10 +76,10 @@ for cfg in os.listdir("/etc/eztv-downloader/shows/"):
                 eztvLogger.logging.info(str(len(episodios_novos)) + " new episodes from " + cfg.replace(".cfg", ""))
                 for episodio_novo in episodios_novos:
                     download(str(episodio_novo))
-		ultimo = re.split('E|X', re.search('(\d+[eExX]\d+)', episodios_novos[len(episodios_novos)-1]).group(0).upper()
+		ultimo = re.split('E|X', re.search('(\d+[eExX]\d+)', episodios_novos[len(episodios_novos)-1]).group(0).upper())
                 config.set('Serie', 'Season', int(ultimo[0]))
                 config.set('Serie', 'Episode', int(ultimo[1]))
-                with open("/etc/eztv-downloader/" + cfg, 'wb') as configfile:
+                with open("/etc/eztv-downloader/shows/" + cfg, 'wb') as configfile:
                     config.write(configfile)
 
             else:
