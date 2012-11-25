@@ -30,7 +30,7 @@ try:
 	url.close()
 
         match = str(re.findall("value\=\"\d+.\>" + show + ".", site, re.I))
-        filename = re.findall(r">(.*)<", match)[0]
+        filename = re.findall(r">(.*)(?:<|,)\']$", match)[0]
         id = match.split("\"")[1]
 
 	config = ConfigParser.RawConfigParser()
