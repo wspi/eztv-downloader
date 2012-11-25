@@ -6,7 +6,11 @@ Conf = ConfigParser.RawConfigParser()
 Conf.read("/etc/eztv-downloader/Conf")
 
 logName = Conf.get('Log', 'filename')
-logLevel = Conf.get('Log', 'level')
+
+if config.has_option('Log', 'level'):
+    logLevel = Conf.get('Log', 'level')
+else:
+    logLevel = 'INFO'
 
 logging.basicConfig(level=logLevel,
                     format='%(asctime)s %(levelname)s %(message)s',
