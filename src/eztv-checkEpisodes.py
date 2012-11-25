@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
@@ -83,7 +82,7 @@ def getEpisode():
                         config.write(configfile)
 
                 else:
-                    eztvLogger.logging.info("No new episodes from " + cfg.replace(".cfg", ""))
+                    eztvLogger.logging.debug("No new episodes from " + cfg.replace(".cfg", ""))
     except:
         print "Error!"
 	traceback.print_exc(file=sys.stdout)
