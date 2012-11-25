@@ -8,14 +8,7 @@ if (len(sys.argv) < 4):
     sys.exit(1)
 
 
-filename = sys.argv[1].title()
-
-if ('The ' in filename):
-	filename = filename.split('The ')[1]
-
-if (' Of ' in filename):
-	filename = filename.replace(' Of ', ' of ')
-
+show = re.sub('^the ','',sys.argv[1].title().lower())
 season = sys.argv[2]
 episode = sys.argv[3]
 
@@ -36,7 +29,9 @@ try:
 	site = url.read()
 	url.close()
 
-	id = str(re.findall("value\=\"\d+.\>" + filename + ".", site)).split("\"")[1]
+        match = str(re.findall("value\=\"\d+.\>" + show + ".", site, re.I))
+        filename = re.findall(r">(.*)<", match)[0]
+        id = match.split("\"")[1]
 
 	config = ConfigParser.RawConfigParser()
 
