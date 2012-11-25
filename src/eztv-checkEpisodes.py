@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
@@ -55,7 +56,7 @@ def getEpisode():
   	        torrents = []
                 for link in links:
 		    if link.endswith(".torrent"):
-			torrents.append(re.findall(r'(.*(?:s|season|\.)(\d{1,2})(?:e|x|episode)(\d{1,2}).*)', link, re.I))
+			torrents.append(re.findall(r'(.*(?:s|season|\.|_)(\d{1,2})(?:e|x|episode)(\d{1,2}).*)', link, re.I))
 		
 
                 episodios_processados = []
