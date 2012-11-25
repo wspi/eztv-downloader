@@ -7,7 +7,7 @@ Conf.read("/etc/eztv-downloader/Conf")
 
 logName = Conf.get('Log', 'filename')
 
-if config.has_option('Log', 'level'):
+if Conf.has_option('Log', 'level'):
     logLevel = Conf.get('Log', 'level')
 else:
     logLevel = 'INFO'
