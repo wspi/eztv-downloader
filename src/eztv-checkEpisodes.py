@@ -37,6 +37,11 @@ def getEpisode():
             if cfg.endswith(".cfg"):
                 config = ConfigParser.RawConfigParser()
                 config.read("/etc/eztv-downloader/shows/" + cfg)
+                
+                if config.has_option('Serie', 'Quality'):
+                    serie_quality = config.get('Serie', 'Quality')
+                else:
+                    serie_quality = 'undefined'
 
         	episodio_local=[config.getint('Serie', 'Season'), config.getint('Serie', 'Episode')]
         	episodios_novos = []
@@ -64,6 +69,11 @@ def getEpisode():
                     if (len(torrent)==0):
                         pass
                     else:
+                        if serie_quality == '720p' and not re.search('720p', torrent[0][0], re.I):
+                            continue
+                        if serie_quality == 'hdtv' and re.search('720p', torrent[0][0], re.I):
+                            continue
+
 		        episodio = [int(torrent[0][1]), int(torrent[0][2])]
                         if episodio_local >= episodio or episodios_processados.__contains__(episodio):
                             pass
