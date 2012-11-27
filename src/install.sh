@@ -1,10 +1,11 @@
 #!/bin/bash
 
-if [ ! -d /etc/eztv-downloader/shows ]; then
-	mkdir -p /etc/eztv-downloader/shows
+install -v -d /etc/eztv-downloader
+
+if [ ! -e /etc/eztv-downloader/Conf ]; then
+    install -v Conf /etc/eztv-downloader
 fi
 
-cp Conf /etc/eztv-downloader
-cp eztv-checkEpisodes.py /usr/bin/
-cp eztv-addTVshow.py /usr/bin
-cp eztvLogger.py /usr/bin
+install -v eztv-checkEpisodes.py /usr/bin/
+install -v eztv-addTVshow.py /usr/bin
+install -v eztvLogger.py /usr/bin

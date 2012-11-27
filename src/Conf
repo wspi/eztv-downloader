@@ -3,4 +3,4 @@ folder = /home/user/watchfolder/
 
 [Log]
 filename = /var/log/eztv-downloader.log
-
+level = INFO
